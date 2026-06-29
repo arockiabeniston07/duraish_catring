@@ -23,7 +23,7 @@ export default function Reviews() {
           className="text-center mb-10"
         >
           <p className="section-label">Testimonials</p>
-          <h2 className="text-4xl md:text-5xl font-playfair font-bold text-white">Client Reviews</h2>
+          <h2 className="text-[clamp(2rem,6vw,3.5rem)] font-playfair font-bold text-white">Client Reviews</h2>
           <div className="gold-divider mx-auto mt-6" />
         </motion.div>
 

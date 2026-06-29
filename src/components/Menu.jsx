@@ -94,7 +94,6 @@ export default function Menu() {
             <h2 
               className="font-playfair font-bold text-white"
               style={{
-                whiteSpace: 'nowrap',
                 display: 'block',
                 width: '100%',
                 textAlign: 'center',

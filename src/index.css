@@ -40,19 +40,14 @@
 }
 
 /* ---- Base ---- */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
+html,
 body {
+  width: 100%;
+  overflow-x: hidden;
   margin: 0;
+  padding: 0;
   color: var(--cream);
   font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
   background: #0d0020;
   background-image:
     radial-gradient(ellipse at 20% 0%,  rgba(74, 16, 112, 0.35) 0%, transparent 60%),
@@ -60,6 +55,29 @@ body {
     radial-gradient(ellipse at 50% 100%, rgba(26, 5, 40, 0.6)   0%, transparent 70%);
   background-attachment: fixed;
   background-color: #0d0020;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.container,
+section,
+#root {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 h1, h2, h3, h4, h5, h6,

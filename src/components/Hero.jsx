@@ -168,7 +168,7 @@ export default function Hero() {
           </div>
 
           {/* Main headline */}
-          <h1 ref={headlineRef} className="opacity-0 text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+          <h1 ref={headlineRef} className="opacity-0 text-[clamp(2.2rem,8vw,4.5rem)] font-bold mb-6 leading-tight"
             style={{ fontFamily: 'Playfair Display, serif' }}>
             <span className="text-white">Premium Catering &amp;</span>
             <br />
@@ -189,7 +189,7 @@ export default function Hero() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               href="#contact"
-              className="glow-pulse px-8 py-4 font-semibold rounded-full w-full sm:w-auto text-center relative overflow-hidden group"
+              className="glow-pulse px-6 sm:px-8 py-4 font-semibold rounded-full w-full sm:w-auto text-center relative overflow-hidden group"
               style={{ background: '#D4AF37', color: '#1A0528' }}
             >
               <span className="relative z-10">✦ Book Your Event</span>
@@ -200,7 +200,7 @@ export default function Hero() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               href="#menu"
-              className="glass px-8 py-4 font-semibold rounded-full w-full sm:w-auto text-center"
+              className="glass px-6 sm:px-8 py-4 font-semibold rounded-full w-full sm:w-auto text-center"
               style={{ color: '#D4AF37', borderColor: 'rgba(212,175,55,0.4)' }}
             >
               Explore Menu →

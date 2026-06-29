@@ -47,7 +47,7 @@ export default function About() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="w-full lg:w-[55%] flex flex-col items-center lg:items-start text-center lg:text-left"
           >
-            <h2 className="text-3xl md:text-5xl font-playfair font-bold text-[var(--secondary)] tracking-wide mb-6">
+            <h2 className="text-[clamp(1.75rem,5vw,3rem)] font-playfair font-bold text-[var(--secondary)] tracking-wide mb-6">
               ABOUT DURAISH CATERING
             </h2>
             <div className="w-24 h-1 bg-[var(--secondary)] mb-10" />
