@@ -84,14 +84,13 @@ export default function ReelCarousel({ videos }) {
     <div ref={sectionRef} className="relative w-full flex justify-center py-8">
       {/* Container for the Instagram Reel styling with Parallax */}
       <motion.div
-        style={{ y: yParallax }}
         initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
         whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
         viewport={{ once: false, amount: 0.2 }}
         transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
         whileHover={{ scale: 1.02, boxShadow: '0 30px 70px rgba(212,175,55,0.25)' }}
         className="w-full max-w-[400px] h-[80vh] md:h-[750px] relative overflow-hidden rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.6)] border-[8px] border-[#2A0410] transition-shadow duration-500"
-        style={{ background: '#120206' }}
+        style={{ y: yParallax, background: '#120206' }}
       >
         {/* Mute Toggle Button */}
         <button
