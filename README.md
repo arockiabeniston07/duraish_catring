@@ -110,7 +110,7 @@ npm run preview
 ```
 duraish-catering/
 ├── public/
-│   ├── logo.jpeg          ← Brand logo (used everywhere)
+│   ├── logo.png          ← Brand logo (used everywhere)
 │   ├── manifest.json      ← PWA manifest
 │   └── favicon.svg
 ├── src/

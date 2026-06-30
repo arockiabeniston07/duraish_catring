@@ -69,45 +69,65 @@ export default function Contact() {
     setTimeout(() => setSubmitted(false), 6000);
   };
 
+  const textRevealVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } }
+  };
+
+  const blurRevealVariants = {
+    hidden: { opacity: 0, scale: 0.95, filter: "blur(10px)" },
+    show: { opacity: 1, scale: 1, filter: "blur(0px)", transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } }
+  };
+
   return (
-    <section id="contact" className="py-24 relative" style={{ background: 'linear-gradient(180deg, #0d0020 0%, #1A0528 50%, #0d0020 100%)' }}>
+    <section id="contact" className="py-24 relative" style={{ background: 'linear-gradient(180deg, #120206 0%, #2A0410 50%, #120206 100%)' }}>
       <div className="container mx-auto px-4">
         
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: false, amount: 0.2 }}
+          variants={{
+            hidden: { opacity: 0 },
+            show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+          }}
           className="text-center mb-16"
         >
-          <h2 className="text-sm uppercase tracking-[0.3em] text-[#D4AF37] mb-4">Get in Touch</h2>
-          <h3 className="text-[clamp(2rem,6vw,3.5rem)] font-playfair font-bold text-white">Contact & Booking</h3>
-          <div className="gold-divider mx-auto mt-6" />
+          <motion.h2 variants={textRevealVariants} className="text-sm uppercase tracking-[0.3em] text-[#D4AF37] mb-4">Get in Touch</motion.h2>
+          <motion.h3 variants={textRevealVariants} className="text-[clamp(2rem,6vw,3.5rem)] font-playfair font-bold text-white">Contact & Booking</motion.h3>
+          <motion.div variants={textRevealVariants} className="gold-divider mx-auto mt-6" />
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
           
           {/* Contact Information Cards */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: false, amount: 0.2 }}
+            variants={{
+              hidden: { opacity: 0 },
+              show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+            }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 content-start"
           >
             {/* Call Now Card */}
-            <a 
+            <motion.a 
+              variants={blurRevealVariants}
               href="tel:+918807555905" 
               className="group glass-card p-6 rounded-2xl border border-white/5 hover:border-[#D4AF37]/50 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(212,175,55,0.2)] block relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-[40px] group-hover:bg-[#D4AF37]/20 transition-colors pointer-events-none" />
-              <div className="w-12 h-12 bg-[#D4AF37]/10 rounded-full flex items-center justify-center text-[#D4AF37] mb-4 group-hover:bg-[#D4AF37] group-hover:text-[#1A0528] transition-colors relative z-10 shadow-lg">
+              <div className="w-12 h-12 bg-[#D4AF37]/10 rounded-full flex items-center justify-center text-[#D4AF37] mb-4 group-hover:bg-[#D4AF37] group-hover:text-[#2A0410] transition-colors relative z-10 shadow-lg">
                 <Phone size={24} />
               </div>
               <h4 className="font-playfair font-bold text-xl mb-2 text-white relative z-10">Call Now</h4>
               <p className="text-gray-300 group-hover:text-white transition-colors relative z-10">+91 88075 55905</p>
-            </a>
+            </motion.a>
 
             {/* WhatsApp Card */}
-            <a 
+            <motion.a 
+              variants={blurRevealVariants}
               href="https://wa.me/918807555905" 
               target="_blank" 
               rel="noreferrer" 
@@ -119,30 +139,32 @@ export default function Contact() {
               </div>
               <h4 className="font-playfair font-bold text-xl mb-2 text-white relative z-10">WhatsApp</h4>
               <p className="text-gray-300 group-hover:text-white transition-colors relative z-10">Chat with us</p>
-            </a>
+            </motion.a>
 
             {/* Email Card */}
-            <a 
+            <motion.a 
+              variants={blurRevealVariants}
               href="mailto:iduraish@gmail.com" 
               className="group glass-card p-6 rounded-2xl border border-white/5 hover:border-[#D4AF37]/50 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(212,175,55,0.2)] block relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-[40px] group-hover:bg-[#D4AF37]/20 transition-colors pointer-events-none" />
-              <div className="w-12 h-12 bg-[#D4AF37]/10 rounded-full flex items-center justify-center text-[#D4AF37] mb-4 group-hover:bg-[#D4AF37] group-hover:text-[#1A0528] transition-colors relative z-10 shadow-lg">
+              <div className="w-12 h-12 bg-[#D4AF37]/10 rounded-full flex items-center justify-center text-[#D4AF37] mb-4 group-hover:bg-[#D4AF37] group-hover:text-[#2A0410] transition-colors relative z-10 shadow-lg">
                 <Mail size={24} />
               </div>
               <h4 className="font-playfair font-bold text-xl mb-2 text-white relative z-10">Email</h4>
               <p className="text-gray-300 group-hover:text-white transition-colors relative z-10 truncate">iduraish@gmail.com</p>
-            </a>
+            </motion.a>
 
             {/* Location Card */}
-            <a 
+            <motion.a 
+              variants={blurRevealVariants}
               href="https://maps.google.com/?q=Duraish+Catering" 
               target="_blank" 
               rel="noreferrer" 
               className="group glass-card p-6 rounded-2xl border border-white/5 hover:border-[#D4AF37]/50 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(212,175,55,0.2)] block relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-[40px] group-hover:bg-[#D4AF37]/20 transition-colors pointer-events-none" />
-              <div className="w-12 h-12 bg-[#D4AF37]/10 rounded-full flex items-center justify-center text-[#D4AF37] mb-4 group-hover:bg-[#D4AF37] group-hover:text-[#1A0528] transition-colors relative z-10 shadow-lg">
+              <div className="w-12 h-12 bg-[#D4AF37]/10 rounded-full flex items-center justify-center text-[#D4AF37] mb-4 group-hover:bg-[#D4AF37] group-hover:text-[#2A0410] transition-colors relative z-10 shadow-lg">
                 <MapPin size={24} />
               </div>
               <h4 className="font-playfair font-bold text-xl mb-2 text-white relative z-10">Location</h4>
@@ -151,10 +173,11 @@ export default function Contact() {
                 Srinivasa Nagar, <br />
                 Coimbatore - 641023
               </p>
-            </a>
+            </motion.a>
 
             {/* Instagram Card */}
-            <a 
+            <motion.a 
+              variants={blurRevealVariants}
               href="https://www.instagram.com/duraish_catering/" 
               target="_blank" 
               rel="noreferrer" 
@@ -166,10 +189,11 @@ export default function Contact() {
               </div>
               <h4 className="font-playfair font-bold text-xl mb-2 text-white relative z-10">Instagram</h4>
               <p className="text-gray-300 group-hover:text-white transition-colors relative z-10">Follow us</p>
-            </a>
+            </motion.a>
 
             {/* Facebook Card */}
-            <a 
+            <motion.a 
+              variants={blurRevealVariants}
               href="https://www.facebook.com/people/Duraish-catering-service/100095079982386/" 
               target="_blank" 
               rel="noreferrer" 
@@ -181,14 +205,11 @@ export default function Contact() {
               </div>
               <h4 className="font-playfair font-bold text-xl mb-2 text-white relative z-10">Facebook</h4>
               <p className="text-gray-300 group-hover:text-white transition-colors relative z-10">Join our community</p>
-            </a>
+            </motion.a>
 
             {/* ─── Tamil Quote ─── */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.9, ease: "easeOut", delay: 0.2 }}
+              variants={blurRevealVariants}
               className="sm:col-span-2 lg:col-span-3 flex flex-col items-center justify-center pt-10 pb-4 select-none"
             >
               {/* Opening decorative quote mark */}
@@ -280,9 +301,10 @@ export default function Contact() {
 
           {/* Booking Form */}
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
             className="glass-card p-8 rounded-3xl border border-[#D4AF37]/20 shadow-[0_0_30px_rgba(212,175,55,0.05)] relative overflow-hidden group"
           >
             {/* Glow effect */}
@@ -352,7 +374,7 @@ export default function Contact() {
                   required 
                   value={formData.eventType} 
                   onChange={handleChange}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all hover:border-white/20 [&>option]:bg-[#1A0528]"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all hover:border-white/20 [&>option]:bg-[#2A0410]"
                 >
                   <option value="" disabled>Select Event Type</option>
                   <option value="Wedding">Wedding</option>
@@ -397,10 +419,10 @@ export default function Contact() {
                 whileTap={{ scale: 0.97 }}
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full font-bold text-lg py-4 rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_30px_rgba(37,211,102,0.4)] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                className="w-full font-bold text-lg py-4 rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_40px_rgba(37,211,102,0.6)] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 btn-ripple touch-target"
                 style={{ 
                   background: 'linear-gradient(90deg, #D4AF37, #F3E5AB)', 
-                  color: '#1A0528' 
+                  color: '#2A0410' 
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = '#25D366';
@@ -408,7 +430,7 @@ export default function Contact() {
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'linear-gradient(90deg, #D4AF37, #F3E5AB)';
-                  e.currentTarget.style.color = '#1A0528';
+                  e.currentTarget.style.color = '#2A0410';
                 }}
               >
                 <WhatsAppIcon className="w-6 h-6" />

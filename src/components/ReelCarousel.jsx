@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Volume2, VolumeX } from 'lucide-react';
 
 export default function ReelCarousel({ videos }) {
@@ -7,6 +7,15 @@ export default function ReelCarousel({ videos }) {
   const [activeId, setActiveId] = useState(videos[0]?.id);
   const videoRefs = useRef({});
   const [isMuted, setIsMuted] = useState(true);
+
+  // Scroll Parallax Logic
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
+  
+  const yParallax = useTransform(scrollYProgress, [0, 1], [50, -50]);
 
   // Sync muted state and volume directly to video elements for browser compatibility
   useEffect(() => {
@@ -72,15 +81,17 @@ export default function ReelCarousel({ videos }) {
   };
 
   return (
-    <div className="relative w-full flex justify-center py-8">
-      {/* Container for the Instagram Reel styling */}
+    <div ref={sectionRef} className="relative w-full flex justify-center py-8">
+      {/* Container for the Instagram Reel styling with Parallax */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-[400px] h-[80vh] md:h-[750px] relative overflow-hidden rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-[8px] border-[#1A0528]"
-        style={{ background: '#0d0020' }}
+        style={{ y: yParallax }}
+        initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+        whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+        viewport={{ once: false, amount: 0.2 }}
+        transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
+        whileHover={{ scale: 1.02, boxShadow: '0 30px 70px rgba(212,175,55,0.25)' }}
+        className="w-full max-w-[400px] h-[80vh] md:h-[750px] relative overflow-hidden rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.6)] border-[8px] border-[#2A0410] transition-shadow duration-500"
+        style={{ background: '#120206' }}
       >
         {/* Mute Toggle Button */}
         <button
@@ -88,7 +99,7 @@ export default function ReelCarousel({ videos }) {
             e.stopPropagation();
             setIsMuted(!isMuted);
           }}
-          className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#D4AF37] hover:text-[#1A0528] transition-all border border-white/20 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:scale-105"
+          className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#D4AF37] hover:text-[#2A0410] transition-all border border-white/20 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:scale-105 touch-target"
           aria-label={isMuted ? "Unmute video" : "Mute video"}
         >
           {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}

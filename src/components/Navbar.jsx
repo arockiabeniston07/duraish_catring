@@ -12,36 +12,62 @@ const WhatsAppIcon = ({ size = 18 }) => (
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
+
+  const navLinks = [
+    { name: 'Home', href: '#home', id: 'home' },
+    { name: 'About', href: '#about', id: 'about' },
+    { name: 'Previous Works', href: '#gallery', id: 'gallery' },
+    { name: 'Menu', href: '#menu', id: 'menu' },
+    { name: 'FAQ', href: '#faq', id: 'faq' },
+    { name: 'Contact', href: '#contact', id: 'contact' },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Intersection Observer for active nav links
+    const observer = new IntersectionObserver((entries) => {
+      // Find the entry that is most visible
+      const visibleEntries = entries.filter(entry => entry.isIntersecting);
+      if (visibleEntries.length > 0) {
+        // Sort by intersection ratio to get the most visible section
+        visibleEntries.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        setActiveSection(visibleEntries[0].target.id);
+      }
+    }, {
+      rootMargin: '-20% 0px -60% 0px', // Triggers when section is in upper middle of viewport
+      threshold: [0, 0.25, 0.5, 0.75, 1]
+    });
 
-  const navLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
-    { name: 'Previous Works', href: '#gallery' },
-    { name: 'Menu', href: '#menu' },
-    { name: 'FAQ', href: '#faq' },
-    { name: 'Contact', href: '#contact' },
-  ];
+    navLinks.forEach(link => {
+      const el = document.getElementById(link.id);
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'glass py-3' : 'bg-transparent py-5'
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled 
+          ? 'bg-[var(--primary)]/80 backdrop-blur-md py-3 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-b border-[var(--secondary)]/10' 
+          : 'bg-transparent py-5'
       }`}
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex-shrink-0 cursor-pointer" onClick={() => window.scrollTo(0,0)}>
+          <div className="flex-shrink-0 cursor-pointer touch-target" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <div className="flex items-center gap-3">
-              <img src="/logo.jpeg" alt="Duraish Catering Logo" className="w-12 h-12 rounded-full object-cover border-2 border-[var(--secondary)]/40 shadow-[0_0_15px_rgba(212,175,55,0.3)]" />
+              <img src="/logo.png" alt="Duraish Catering Logo" className="w-12 h-12 rounded-full object-cover border-2 border-[var(--secondary)]/40 shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-transform duration-500 hover:scale-105" />
               <div className="hidden sm:block">
                 <span className="text-xl font-bold font-playfair text-[var(--secondary)] tracking-wider block leading-tight">DURAISH</span>
                 <span className="text-xs uppercase tracking-[0.2em] text-gray-400">Catering & Events</span>
@@ -52,24 +78,33 @@ export default function Navbar() {
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-8">
             <ul className="flex items-center gap-6">
-              {navLinks.map((link, index) => (
-                <li key={`${link.name}-${index}`}>
+              {navLinks.map((link) => (
+                <li key={link.id}>
                   <a
                     href={link.href}
-                    className="text-sm uppercase tracking-widest hover:text-[var(--secondary)] transition-colors"
+                    className={`text-sm uppercase tracking-widest transition-all duration-300 relative py-2 touch-target ${
+                      activeSection === link.id ? 'text-[var(--secondary)] font-bold' : 'text-gray-300 hover:text-[var(--secondary)]'
+                    }`}
                   >
                     {link.name}
+                    {activeSection === link.id && (
+                      <motion.div 
+                        layoutId="activeNavIndicator"
+                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--secondary)] rounded-full shadow-[0_0_10px_rgba(212,175,55,0.5)]"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
                   </a>
                 </li>
               ))}
             </ul>
 
             <div className="flex items-center gap-4">
-              <a href="tel:8807555905" className="flex items-center gap-2 text-sm font-medium border border-[var(--secondary)] text-[var(--secondary)] px-4 py-2 rounded-full hover:bg-[var(--secondary)] hover:text-[var(--primary)] transition-all">
+              <a href="tel:8807555905" className="flex items-center gap-2 text-sm font-medium border border-[var(--secondary)] text-[var(--secondary)] px-4 py-2 rounded-full hover:bg-[var(--secondary)] hover:text-[var(--primary)] transition-all touch-target">
                 <Phone size={16} />
                 Call Now
               </a>
-              <a href="https://wa.me/918807555905" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm font-medium bg-[#25D366] text-white px-4 py-2 rounded-full hover:bg-[#1da851] hover:scale-110 hover:shadow-[0_0_25px_rgba(37,211,102,0.5)] transition-all duration-300 shadow-[0_0_15px_rgba(37,211,102,0.3)]">
+              <a href="https://wa.me/918807555905" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm font-medium bg-[#25D366] text-white px-4 py-2 rounded-full hover:bg-[#1da851] hover:scale-105 hover:shadow-[0_0_25px_rgba(37,211,102,0.5)] transition-all duration-300 shadow-[0_0_15px_rgba(37,211,102,0.3)] touch-target">
                 <WhatsAppIcon size={16} />
                 WhatsApp
               </a>
@@ -80,9 +115,16 @@ export default function Navbar() {
           <div className="lg:hidden flex items-center gap-4">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-[var(--secondary)]"
+              className="text-[var(--secondary)] touch-target p-2 -mr-2"
+              aria-label="Toggle Menu"
             >
-              {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              <motion.div
+                initial={false}
+                animate={{ rotate: isMobileMenuOpen ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              </motion.div>
             </button>
           </div>
         </div>
@@ -91,30 +133,35 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="lg:hidden absolute top-full left-0 right-0 glass-card m-4 p-6"
+          initial={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          className="lg:hidden absolute top-full left-0 right-0 bg-[var(--primary)]/95 backdrop-blur-xl border-b border-[var(--secondary)]/20 shadow-2xl m-4 p-6 rounded-2xl"
         >
-          <ul className="flex flex-col gap-4">
-            {navLinks.map((link, index) => (
-              <li key={`${link.name}-${index}`}>
+          <ul className="flex flex-col gap-2">
+            {navLinks.map((link) => (
+              <li key={`mobile-${link.id}`}>
                 <a
                   href={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-lg hover:text-[var(--secondary)] transition-colors"
+                  className={`block text-lg py-3 px-4 rounded-xl transition-all touch-target ${
+                    activeSection === link.id 
+                      ? 'bg-[var(--secondary)]/10 text-[var(--secondary)] font-bold' 
+                      : 'text-gray-300 hover:text-[var(--secondary)] hover:bg-white/5'
+                  }`}
                 >
                   {link.name}
                 </a>
               </li>
             ))}
-            <div className="h-px bg-white/10 my-2" />
-            <div className="flex flex-col gap-3 mt-2">
-              <a href="tel:8807555905" className="flex items-center justify-center gap-2 font-medium border border-[var(--secondary)] text-[var(--secondary)] px-4 py-3 rounded-full hover:bg-[var(--secondary)] hover:text-[var(--primary)] transition-all">
+            <div className="h-px bg-white/10 my-4" />
+            <div className="flex flex-col gap-3">
+              <a href="tel:8807555905" className="flex items-center justify-center gap-2 font-medium border border-[var(--secondary)] text-[var(--secondary)] px-4 py-3 rounded-full hover:bg-[var(--secondary)] hover:text-[var(--primary)] transition-all touch-target">
                 <Phone size={18} />
                 Call Now
               </a>
-              <a href="https://wa.me/918807555905" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 font-medium bg-[#25D366] text-white px-4 py-3 rounded-full hover:scale-105 hover:shadow-[0_0_25px_rgba(37,211,102,0.5)] transition-all duration-300 shadow-[0_0_15px_rgba(37,211,102,0.3)]">
+              <a href="https://wa.me/918807555905" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 font-medium bg-[#25D366] text-white px-4 py-3 rounded-full hover:scale-105 hover:shadow-[0_0_25px_rgba(37,211,102,0.5)] transition-all duration-300 shadow-[0_0_15px_rgba(37,211,102,0.3)] touch-target">
                 <WhatsAppIcon size={18} />
                 WhatsApp
               </a>

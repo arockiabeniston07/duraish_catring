@@ -147,6 +147,7 @@ export const galleryVideos = [
   { id: 5, src: "./video/service5.mp4" },
   { id: 6, src: "./video/service6.mp4" },
   { id: 7, src: "./video/service7.mp4" },
+  { id: 8, src: "./video/service8.mp4" },
 ];
 
 // ─── REVIEW VIDEOS (CUSTOMER TESTIMONIALS) ──────────────────────
@@ -157,4 +158,5 @@ export const reviewVideos = [
   { id: 3, src: "./video/review3.mp4" },
   { id: 4, src: "./video/review4.mp4" },
   { id: 5, src: "./video/review6.mp4" },
+  { id: 6, src: "./video/review7.mp4" },
 ];

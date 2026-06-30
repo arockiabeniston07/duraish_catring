@@ -8,7 +8,7 @@ export default function Reviews() {
     <section
       id="reviews"
       className="py-24 relative overflow-hidden"
-      style={{ background: 'linear-gradient(180deg, #0d0020 0%, #1A0528 50%, #0d0020 100%)' }}
+      style={{ background: 'linear-gradient(180deg, #120206 0%, #2A0410 50%, #120206 100%)' }}
     >
       {/* Glow */}
       <div className="absolute top-1/2 left-0 w-64 h-64 rounded-full blur-[100px] opacity-10 pointer-events-none -translate-y-1/2"

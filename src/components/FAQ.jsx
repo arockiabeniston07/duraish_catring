@@ -40,41 +40,66 @@ export default function FAQ() {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+    }
+  };
+
+  const textRevealVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } }
+  };
+
+  const blurRevealVariants = {
+    hidden: { opacity: 0, y: 20, filter: "blur(10px)" },
+    show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } }
+  };
+
   return (
-    <section id="faq" className="py-24 relative" style={{ background: 'linear-gradient(180deg, #0d0020 0%, #1A0528 50%, #0d0020 100%)' }}>
+    <section id="faq" className="py-24 relative" style={{ background: 'linear-gradient(180deg, #120206 0%, #2A0410 50%, #120206 100%)' }}>
       <div className="container mx-auto px-4 max-w-4xl">
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: false, amount: 0.2 }}
+          variants={{
+            hidden: { opacity: 0 },
+            show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+          }}
           className="text-center mb-16"
         >
-          <h2 className="text-sm uppercase tracking-[0.3em] text-[var(--secondary)] mb-4">Common Queries</h2>
-          <h3 className="text-[clamp(1.75rem,5vw,3rem)] font-playfair font-bold text-white">Frequently Asked Questions</h3>
-          <div className="w-24 h-1 bg-[var(--secondary)] mx-auto mt-6" />
+          <motion.h2 variants={textRevealVariants} className="text-sm uppercase tracking-[0.3em] text-[var(--secondary)] mb-4">Common Queries</motion.h2>
+          <motion.h3 variants={textRevealVariants} className="text-[clamp(1.75rem,5vw,3rem)] font-playfair font-bold text-white">Frequently Asked Questions</motion.h3>
+          <motion.div variants={textRevealVariants} className="w-24 h-1 bg-[var(--secondary)] mx-auto mt-6" />
         </motion.div>
 
-        <div className="space-y-4">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: false, amount: 0.1 }}
+          className="space-y-4"
+        >
           {faqs.map((faq, index) => (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              variants={blurRevealVariants}
               key={`faq-${index}`}
-              className="glass-card overflow-hidden border border-white/5"
+              className="glass-card overflow-hidden border border-white/5 transition-colors duration-300 hover:border-[var(--secondary)]/30"
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full flex items-center justify-between p-6 text-left focus:outline-none"
+                className="w-full flex items-center justify-between p-6 text-left focus:outline-none touch-target group btn-ripple"
               >
-                <span className="font-playfair text-lg md:text-xl font-bold text-white pr-8">
+                <span className="font-playfair text-lg md:text-xl font-bold text-white pr-8 transition-colors duration-300 group-hover:text-[var(--secondary)]">
                   {faq.question}
                 </span>
                 <motion.div
                   animate={{ rotate: activeIndex === index ? 180 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex-shrink-0 text-[var(--secondary)] bg-white/5 p-2 rounded-full"
+                  transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                  className="flex-shrink-0 text-[var(--secondary)] bg-white/5 p-2 rounded-full transition-transform duration-300 group-hover:scale-110"
                 >
                   <ChevronDown size={20} />
                 </motion.div>
@@ -86,7 +111,7 @@ export default function FAQ() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
                   >
                     <div className="p-6 pt-0 text-gray-300 leading-relaxed border-t border-white/5 mt-2">
                       {faq.answer}
@@ -96,7 +121,7 @@ export default function FAQ() {
               </AnimatePresence>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -52,7 +52,7 @@ export default function LoadingScreen({ onComplete }) {
       ref={containerRef}
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
       style={{
-        background: 'radial-gradient(ellipse at center, #2D0A4E 0%, #1A0528 50%, #0d0020 100%)',
+        background: 'radial-gradient(ellipse at center, #4A0A18 0%, #2A0410 50%, #120206 100%)',
       }}
     >
       {/* Ambient glow */}
@@ -106,7 +106,7 @@ export default function LoadingScreen({ onComplete }) {
           <div ref={logoRef} className="opacity-0 flex items-center justify-center">
             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#D4AF37]/50 shadow-[0_0_40px_rgba(212,175,55,0.3)]">
               <img
-                src="/logo.jpeg"
+                src="/logo.png"
                 alt="Duraish Catering"
                 className="w-full h-full object-cover object-center"
               />

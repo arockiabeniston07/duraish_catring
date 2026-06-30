@@ -63,7 +63,7 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-white/5 pt-20 pb-8 relative overflow-hidden"
-      style={{ background: 'linear-gradient(180deg, #0d0020 0%, #0a0018 100%)' }}>
+      style={{ background: 'linear-gradient(180deg, #120206 0%, #0e0104 100%)' }}>
       {/* Decorative Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] rounded-full blur-[100px] pointer-events-none opacity-15"
         style={{ background: 'radial-gradient(ellipse, rgba(212,175,55,0.5) 0%, transparent 70%)' }} />
@@ -71,9 +71,10 @@ export default function Footer() {
       <div className="container mx-auto px-4 relative z-10">
         {/* Tamil Quote Banner */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: false, amount: 0.5 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
           className="text-center mb-16 pb-16 border-b border-white/10"
         >
           <div className="inline-block border-y border-[var(--secondary)]/50 py-6 px-8">
@@ -84,17 +85,26 @@ export default function Footer() {
         </motion.div>
 
         {/* ── 4-Column Footer Grid ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
+        <motion.div 
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: false, amount: 0.1 }}
+          variants={{
+            hidden: { opacity: 0 },
+            show: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.1 } }
+          }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-16"
+        >
 
           {/* Section 1: Brand */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } }
+            }}
           >
             <div className="flex items-center gap-3 mb-6">
-              <img src="/logo.jpeg" alt="Duraish Catering Logo" className="w-12 h-12 rounded-full object-cover border-2 border-[var(--secondary)]/40 shadow-[0_0_15px_rgba(212,175,55,0.3)]" />
+              <img src="/logo.png" alt="Duraish Catering Logo" className="w-12 h-12 rounded-full object-cover border-2 border-[var(--secondary)]/40 shadow-[0_0_15px_rgba(212,175,55,0.3)]" />
               <div>
                 <h3 className="font-playfair font-bold text-xl text-[var(--secondary)]">DURAISH</h3>
                 <p className="text-xs text-gray-400 uppercase tracking-widest">Catering &amp; Events</p>
@@ -107,16 +117,16 @@ export default function Footer() {
 
           {/* Section 2: Quick Links */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } }
+            }}
           >
             <h4 className="font-playfair font-bold text-lg text-[var(--secondary)] mb-6 after:block after:w-10 after:h-0.5 after:bg-[var(--secondary)] after:mt-2">Quick Links</h4>
             <ul className="space-y-3">
               {quickLinks.map((link, index) => (
                 <li key={`footer-link-${index}`}>
-                  <a href={link.href} className="text-gray-400 hover:text-[var(--secondary)] transition-colors duration-300 text-sm flex items-center gap-2 group">
+                  <a href={link.href} className="text-gray-400 hover:text-[var(--secondary)] transition-colors duration-300 text-sm flex items-center gap-2 group touch-target">
                     <span className="w-1.5 h-1.5 rounded-full bg-[var(--secondary)]/40 group-hover:bg-[var(--secondary)] transition-colors duration-300" />
                     {link.name}
                   </a>
@@ -127,16 +137,16 @@ export default function Footer() {
 
           {/* Section 3: Contact Information */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } }
+            }}
           >
             <h4 className="font-playfair font-bold text-lg text-[var(--secondary)] mb-6 after:block after:w-10 after:h-0.5 after:bg-[var(--secondary)] after:mt-2">Contact Information</h4>
             <ul className="space-y-5">
               <li>
-                <a href="mailto:Pandiyandurai@gmail.com" className="flex items-start gap-3 group cursor-pointer hover:translate-x-1 transition-all duration-300">
-                  <Mail size={16} className="text-[var(--secondary)] shrink-0 mt-1 group-hover:scale-110 transition-transform duration-300" />
+                <a href="mailto:Pandiyandurai@gmail.com" className="flex items-start gap-3 group cursor-pointer hover:translate-x-1 transition-all duration-300 touch-target">
+                  <Mail size={16} className="text-[var(--secondary)] shrink-0 mt-1 group-hover:scale-110 transition-transform duration-300 group-hover:-translate-y-1" />
                   <div>
                     <span className="text-gray-500 text-xs uppercase tracking-wider block mb-1">Email</span>
                     <span className="text-gray-300 group-hover:text-[var(--secondary)] transition-colors duration-300 text-sm">
@@ -146,8 +156,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="https://wa.me/918807555905" target="_blank" rel="noreferrer" className="flex items-start gap-3 group cursor-pointer hover:translate-x-1 transition-all duration-300">
-                  <span className="text-[var(--secondary)] shrink-0 mt-1 group-hover:scale-110 transition-transform duration-300 inline-block">
+                <a href="https://wa.me/918807555905" target="_blank" rel="noreferrer" className="flex items-start gap-3 group cursor-pointer hover:translate-x-1 transition-all duration-300 touch-target">
+                  <span className="text-[var(--secondary)] shrink-0 mt-1 group-hover:scale-110 transition-transform duration-300 inline-block group-hover:-translate-y-1">
                     <WhatsAppIcon size={16} />
                   </span>
                   <div>
@@ -159,8 +169,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="https://www.instagram.com/duraish_catering/" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 group cursor-pointer hover:translate-x-1 transition-all duration-300">
-                  <span className="text-[var(--secondary)] shrink-0 mt-1 group-hover:scale-110 transition-transform duration-300 inline-block">
+                <a href="https://www.instagram.com/duraish_catering/" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 group cursor-pointer hover:translate-x-1 transition-all duration-300 touch-target">
+                  <span className="text-[var(--secondary)] shrink-0 mt-1 group-hover:scale-110 transition-transform duration-300 inline-block group-hover:-translate-y-1">
                     <InstagramIcon size={16} />
                   </span>
                   <div>
@@ -172,8 +182,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="https://www.facebook.com/people/Duraish-catering-service/100095079982386/" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 group cursor-pointer hover:translate-x-1 transition-all duration-300">
-                  <span className="text-[var(--secondary)] shrink-0 mt-1 group-hover:scale-110 transition-transform duration-300 inline-block">
+                <a href="https://www.facebook.com/people/Duraish-catering-service/100095079982386/" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 group cursor-pointer hover:translate-x-1 transition-all duration-300 touch-target">
+                  <span className="text-[var(--secondary)] shrink-0 mt-1 group-hover:scale-110 transition-transform duration-300 inline-block group-hover:-translate-y-1">
                     <FacebookIcon size={16} />
                   </span>
                   <div>
@@ -185,8 +195,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="https://maps.google.com/?q=45+New+Amma+Park+Srinivasa+Nagar+Podanur+Coimbatore+641023" target="_blank" rel="noreferrer" className="flex items-start gap-3 group cursor-pointer hover:translate-x-1 transition-all duration-300">
-                  <MapPin size={16} className="text-[var(--secondary)] shrink-0 mt-1 group-hover:scale-110 transition-transform duration-300" />
+                <a href="https://maps.google.com/?q=45+New+Amma+Park+Srinivasa+Nagar+Podanur+Coimbatore+641023" target="_blank" rel="noreferrer" className="flex items-start gap-3 group cursor-pointer hover:translate-x-1 transition-all duration-300 touch-target">
+                  <MapPin size={16} className="text-[var(--secondary)] shrink-0 mt-1 group-hover:scale-110 transition-transform duration-300 group-hover:-translate-y-1" />
                   <div>
                     <span className="text-gray-500 text-xs uppercase tracking-wider block mb-1">Location</span>
                     <span className="text-gray-300 group-hover:text-[var(--secondary)] transition-colors duration-300 text-sm leading-relaxed block">
@@ -202,10 +212,10 @@ export default function Footer() {
 
           {/* Section 4: Follow Us */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } }
+            }}
           >
             <h4 className="font-playfair font-bold text-lg text-[var(--secondary)] mb-6 after:block after:w-10 after:h-0.5 after:bg-[var(--secondary)] after:mt-2">Follow Us</h4>
             <div className="flex flex-col gap-4">
@@ -215,10 +225,10 @@ export default function Footer() {
                   href={social.href}
                   target={social.name !== 'Email' ? '_blank' : undefined}
                   rel={social.name !== 'Email' ? 'noreferrer' : undefined}
-                  className={`flex items-center gap-4 glass-card p-4 rounded-xl border border-white/5 text-gray-400 transition-all duration-300 hover:scale-105 ${social.hoverColor}`}
+                  className={`flex items-center gap-4 glass-card p-4 rounded-xl border border-white/5 text-gray-400 transition-all duration-300 hover:scale-105 touch-target ${social.hoverColor} group`}
                   aria-label={social.name}
                 >
-                  <div className="w-10 h-10 rounded-full glass flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-full glass flex items-center justify-center shrink-0 group-hover:-translate-y-1 transition-transform duration-300">
                     {social.icon}
                   </div>
                   <span className="text-sm font-medium">{social.name}</span>
@@ -234,7 +244,7 @@ export default function Footer() {
             </div>
           </motion.div>
 
-        </div>
+        </motion.div>
 
         {/* Bottom Bar */}
         <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
