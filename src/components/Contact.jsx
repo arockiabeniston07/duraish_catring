@@ -303,7 +303,7 @@ const Contact = React.memo(() => {
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full mt-auto justify-center">
                   <a 
-                    href="https://wa.me/9188075 55905"
+                    href="https://wa.me/918807555905"
                     target="_blank"
                     rel="noreferrer"
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:border-[#25D366] hover:text-[#25D366] hover:bg-[#25D366]/5 transition-all font-medium text-[0.85rem]"
