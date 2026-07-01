@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { menuData } from '../data/menuData';
 
@@ -18,11 +18,42 @@ const textRevealVariants = {
 
 // ─── Single Menu Category Card ────────────────────────────────
 function MenuCategoryCard({ categoryData, index }) {
+  const handleWheel = (e) => {
+    // Only apply intelligent scroll handling on desktop
+    if (window.innerWidth < 1024) return;
+    
+    const el = e.currentTarget;
+    const isScrollable = el.scrollHeight > el.clientHeight;
+    
+    // Ignore if not scrollable or no vertical movement
+    if (!isScrollable || e.deltaY === 0) return;
+    
+    // Allow 1px tolerance for fractional scrolling
+    const isAtTop = el.scrollTop <= 0;
+    const isAtBottom = Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) <= 1;
+    
+    const scrollingUp = e.deltaY < 0;
+    const scrollingDown = e.deltaY > 0;
+    
+    // Scroll Chaining: If at the boundary and trying to scroll further,
+    // let the event bubble up so the main page scrolls.
+    if ((isAtTop && scrollingUp) || (isAtBottom && scrollingDown)) {
+      return; 
+    }
+    
+    // Inside bounds: stop propagation so outer page scroll (like Lenis) doesn't hijack it.
+    e.stopPropagation();
+    if (e.nativeEvent) {
+      e.nativeEvent.stopPropagation();
+      e.nativeEvent.stopImmediatePropagation();
+    }
+  };
+
   return (
     <motion.div
       className="menu-cat-card"
-      initial={{ opacity: 0, scale: 0.95, y: 100, filter: "blur(10px)" }}
-      whileInView={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+      initial={{ opacity: 0, scale: 0.95, y: 100 }}
+      whileInView={{ opacity: 1, scale: 1, y: 0 }}
       viewport={{ once: false, amount: 0.2 }}
       transition={{ duration: 0.8, delay: index * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
       whileHover={{ y: -5, scale: 1.02, boxShadow: '0 20px 40px rgba(212,175,55,0.2)' }}
@@ -37,7 +68,12 @@ function MenuCategoryCard({ categoryData, index }) {
       <div className="menu-cat-divider" aria-hidden="true" />
 
       {/* Food Item List */}
-      <ul className="menu-cat-list" role="list">
+      <ul 
+        className="menu-cat-list" 
+        role="list"
+        onWheel={handleWheel}
+        style={{ overscrollBehavior: 'contain' }}
+      >
         {categoryData.items.map((foodName, i) => (
           <motion.li
             key={`${categoryData.category}-${foodName}-${i}`}
@@ -59,7 +95,7 @@ function MenuCategoryCard({ categoryData, index }) {
 }
 
 // ─── Main Menu Section ────────────────────────────────────────
-export default function Menu() {
+const Menu = React.memo(() => {
   const [activeMeal, setActiveMeal] = useState(MEAL_CATEGORIES[0]);
 
   const handleMealChange = (meal) => {
@@ -119,8 +155,8 @@ export default function Menu() {
 
           {/* ── Meal Category Tabs ── */}
           <motion.div
-            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
             className="flex flex-wrap justify-center gap-4 mb-14"
@@ -144,9 +180,9 @@ export default function Menu() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeMeal}
-              initial={{ opacity: 0, filter: "blur(10px)" }}
-              animate={{ opacity: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, filter: "blur(10px)" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
               className="menu-cards-grid"
             >
@@ -164,4 +200,6 @@ export default function Menu() {
       </section>
     </>
   );
-}
+});
+
+export default Menu;

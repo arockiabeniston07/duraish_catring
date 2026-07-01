@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 
-export default function LoadingScreen({ onComplete }) {
+const LoadingScreen = React.memo(({ onComplete }) => {
   const barRef = useRef(null);
   const ringRef = useRef(null);
   const logoRef = useRef(null);
@@ -155,4 +155,6 @@ export default function LoadingScreen({ onComplete }) {
       </motion.p>
     </div>
   );
-}
+});
+
+export default LoadingScreen;

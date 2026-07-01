@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Volume2, VolumeX } from 'lucide-react';
 
-export default function ReelCarousel({ videos }) {
+const ReelCarousel = React.memo(({ videos }) => {
   const containerRef = useRef(null);
   const [activeId, setActiveId] = useState(videos[0]?.id);
   const videoRefs = useRef({});
@@ -84,8 +84,8 @@ export default function ReelCarousel({ videos }) {
     <div ref={sectionRef} className="relative w-full flex justify-center py-8">
       {/* Container for the Instagram Reel styling with Parallax */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-        whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: false, amount: 0.2 }}
         transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
         whileHover={{ scale: 1.02, boxShadow: '0 30px 70px rgba(212,175,55,0.25)' }}
@@ -150,4 +150,6 @@ export default function ReelCarousel({ videos }) {
       </motion.div>
     </div>
   );
-}
+});
+
+export default ReelCarousel;

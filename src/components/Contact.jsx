@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Phone, Mail, CheckCircle } from 'lucide-react';
 
@@ -25,7 +25,7 @@ const FacebookIcon = ({ className }) => (
   </svg>
 );
 
-export default function Contact() {
+const Contact = React.memo(() => {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -34,39 +34,169 @@ export default function Contact() {
     people: '',
     message: ''
   });
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  const getTodayDate = () => {
+    const today = new Date();
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    return today.toISOString().split('T')[0];
+  };
+
+  const validateField = (name, value) => {
+    let error = '';
+    switch (name) {
+      case 'name': {
+        const trimmed = value.trim();
+        if (!trimmed) {
+          error = 'Please enter your full name.';
+        } else if (!/^[a-zA-Z\s'.]+$/.test(value)) {
+          error = 'Only alphabets, spaces, apostrophes and periods are allowed.';
+        } else if (trimmed.length < 3 || trimmed.length > 50) {
+          error = 'Name must be between 3 and 50 characters.';
+        }
+        break;
+      }
+      case 'phone': {
+        if (!value) {
+          error = 'Please enter your phone number.';
+        } else if (!/^[6-9]\d{9}$/.test(value)) {
+          error = 'Enter a valid 10-digit mobile number.';
+        }
+        break;
+      }
+      case 'date': {
+        if (!value) {
+          error = 'Please select an event date.';
+        } else if (value < getTodayDate()) {
+          error = 'Please select a future date.';
+        }
+        break;
+      }
+      case 'people': {
+        if (!value) {
+          error = 'Please enter the number of people.';
+        } else {
+          const num = Number(value);
+          if (!Number.isInteger(num) || num < 10 || num > 5000) {
+            error = 'Number of people must be between 10 and 5000.';
+          }
+        }
+        break;
+      }
+      case 'eventType': {
+        if (!value) {
+          error = 'Please select an event type.';
+        }
+        break;
+      }
+      case 'message': {
+        if (value.length > 500) {
+          error = 'Message cannot exceed 500 characters.';
+        }
+        break;
+      }
+      default:
+        break;
+    }
+    return error;
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let newValue = value;
+
+    if (name === 'phone' || name === 'people') {
+      newValue = value.replace(/[^\d]/g, '');
+    }
+    
+    if (name === 'message' && value.length > 500) {
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
+    
+    const error = validateField(name, newValue);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+    if (!touched[name]) {
+      setTouched((prev) => ({ ...prev, [name]: true }));
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    let newValue = value;
+    if (name === 'name') {
+        newValue = value.trim();
+        setFormData(prev => ({...prev, name: newValue}));
+    }
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, newValue) }));
+  };
+
+  const isFormValid = () => {
+    const fields = ['name', 'phone', 'date', 'eventType', 'people'];
+    const currentErrors = fields.map(f => validateField(f, formData[f]));
+    const hasErrors = currentErrors.some(err => err !== '');
+    const hasEmptyRequired = fields.some(f => formData[f] === '');
+    return !hasErrors && !hasEmptyRequired && errors.message === '' && !isSubmitting;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    const newErrors = {};
+    const newTouched = {};
+    let firstInvalid = null;
+    
+    Object.keys(formData).forEach((key) => {
+      const error = validateField(key, formData[key]);
+      newErrors[key] = error;
+      newTouched[key] = true;
+      if (error && !firstInvalid) {
+        firstInvalid = key;
+      }
+    });
+
+    setErrors(newErrors);
+    setTouched(newTouched);
+
+    if (firstInvalid) {
+      const el = document.getElementById(firstInvalid);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.focus();
+      }
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Build WhatsApp message
-    const whatsappMessage = [
-      `*New Booking Enquiry — Duraish Catering*`,
-      `-----------------------------------`,
-      `*Name:* ${formData.name}`,
-      `*Phone:* ${formData.phone}`,
-      `*Event Date:* ${formData.date}`,
-      `*Event Type:* ${formData.eventType}`,
-      `*People Count:* ${formData.people}`,
-      `*Message:* ${formData.message || 'N/A'}`,
-    ].join('\n');
+    setTimeout(() => {
+      const whatsappMessage = [
+        `📅 *New Event Booking*`,
+        ``,
+        `👤 *Name:* ${formData.name}`,
+        `📞 *Phone:* ${formData.phone}`,
+        `📆 *Event Date:* ${formData.date}`,
+        `👥 *Number of People:* ${formData.people}`,
+        `🎉 *Event Type:* ${formData.eventType}`,
+        `📝 *Requirements:* ${formData.message || 'None'}`
+      ].join('\n');
 
-    const encodedMessage = encodeURIComponent(whatsappMessage);
-    window.open(`https://wa.me/918807555905?text=${encodedMessage}`, '_blank');
+      const encodedMessage = encodeURIComponent(whatsappMessage);
+      window.open(`https://wa.me/918807555905?text=${encodedMessage}`, '_blank');
 
-    // Show success state and reset
-    setSubmitted(true);
-    setIsSubmitting(false);
-    setFormData({ name: '', phone: '', date: '', eventType: '', people: '', message: '' });
+      setSubmitted(true);
+      setIsSubmitting(false);
+      setFormData({ name: '', phone: '', date: '', eventType: '', people: '', message: '' });
+      setTouched({});
+      setErrors({});
 
-    // Auto-hide success message after 6 seconds
-    setTimeout(() => setSubmitted(false), 6000);
+      setTimeout(() => setSubmitted(false), 6000);
+    }, 1000);
   };
 
   const textRevealVariants = {
@@ -75,8 +205,18 @@ export default function Contact() {
   };
 
   const blurRevealVariants = {
-    hidden: { opacity: 0, scale: 0.95, filter: "blur(10px)" },
-    show: { opacity: 1, scale: 1, filter: "blur(0px)", transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } }
+    hidden: { opacity: 0, scale: 0.95 },
+    show: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } }
+  };
+
+  const getInputClass = (name) => {
+    const baseClass = "w-full bg-white/5 border rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-1 transition-all";
+    if (touched[name] && errors[name]) {
+      return `${baseClass} border-red-500 focus:border-red-500 focus:ring-red-500 hover:border-red-400`;
+    } else if (touched[name] && !errors[name] && formData[name]) {
+      return `${baseClass} border-green-500 focus:border-green-500 focus:ring-green-500 hover:border-green-400`;
+    }
+    return `${baseClass} border-white/10 focus:border-[#D4AF37] focus:ring-[#D4AF37] hover:border-white/20`;
   };
 
   return (
@@ -91,16 +231,137 @@ export default function Contact() {
             hidden: { opacity: 0 },
             show: { opacity: 1, transition: { staggerChildren: 0.1 } }
           }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <motion.h2 variants={textRevealVariants} className="text-sm uppercase tracking-[0.3em] text-[#D4AF37] mb-4">Get in Touch</motion.h2>
           <motion.h3 variants={textRevealVariants} className="text-[clamp(2rem,6vw,3.5rem)] font-playfair font-bold text-white">Contact & Booking</motion.h3>
           <motion.div variants={textRevealVariants} className="gold-divider mx-auto mt-6" />
         </motion.div>
 
+        {/* Meet Our Founders Section */}
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: false, amount: 0.2 }}
+          variants={{
+            hidden: { opacity: 0 },
+            show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+          }}
+          className="mb-16 max-w-[900px] mx-auto"
+        >
+          <div className="glass-card rounded-3xl p-8 md:p-12 border border-[#D4AF37]/20 shadow-[0_0_30px_rgba(212,175,55,0.05)] relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF37]/5 rounded-full blur-[80px] pointer-events-none group-hover:bg-[#D4AF37]/10 transition-colors duration-700" />
+            
+            <div className="text-center mb-10 relative z-10">
+              <motion.h3 variants={textRevealVariants} className="text-[clamp(1.8rem,4vw,2.2rem)] font-playfair font-bold text-white tracking-wide">Meet Our Founders</motion.h3>
+              <motion.div variants={textRevealVariants} className="flex items-center justify-center gap-2 mt-4">
+                 <div className="w-12 h-px bg-[#D4AF37]/50" />
+                 <div className="w-1.5 h-1.5 rotate-45 border border-[#D4AF37]/50" />
+                 <div className="w-12 h-px bg-[#D4AF37]/50" />
+              </motion.div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 md:gap-0 relative z-10">
+              {/* Vertical divider for desktop */}
+              <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-px bg-white/10 -translate-x-1/2"></div>
+              
+              {/* Founder 1 */}
+              <motion.div 
+                variants={blurRevealVariants}
+                className="flex flex-col items-center text-center md:pr-10 group/founder"
+              >
+                <div className="w-[150px] h-[150px] rounded-full border border-[#D4AF37]/50 p-1 mb-5 transition-transform duration-500 group-hover/founder:scale-105 group-hover/founder:shadow-[0_0_20px_rgba(212,175,55,0.2)] group-hover/founder:border-[#D4AF37]">
+                  <div className="w-full h-full rounded-full bg-white/5 overflow-hidden relative">
+                    <img src="./video/contact1.jpeg" alt="Pandian" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-80 group-hover/founder:opacity-100 transition-opacity duration-300" />
+                  </div>
+                </div>
+                <h4 className="text-[1.35rem] font-playfair font-bold text-white mb-1 group-hover/founder:text-[#D4AF37] transition-colors">Pandian</h4>
+                <p className="text-[#D4AF37] font-medium text-[0.85rem] mb-1">Founder</p>
+                <p className="text-gray-300 text-[0.85rem] mb-6">Operations & Event Management</p>
+                
+                <div className="flex flex-col gap-3 mb-8 w-max mx-auto">
+                  <a href="tel:+919787812345" className="flex items-center gap-4 text-gray-300 hover:text-[#D4AF37] transition-colors">
+                    <Phone size={18} strokeWidth={1.5} className="opacity-80" />
+                    <span className="text-[0.95rem] tracking-wide">+91 97878 12345</span>
+                  </a>
+                  <a href="mailto:pandiyan.durai@gmail.com" className="flex items-center gap-4 text-gray-300 hover:text-[#D4AF37] transition-colors">
+                    <Mail size={18} strokeWidth={1.5} className="opacity-80" />
+                    <span className="text-[0.95rem]">pandiyan.durai@gmail.com</span>
+                  </a>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 w-full mt-auto justify-center">
+                  <a 
+                    href="https://wa.me/919787812345"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:border-[#25D366] hover:text-[#25D366] hover:bg-[#25D366]/5 transition-all font-medium text-[0.85rem]"
+                  >
+                    <WhatsAppIcon className="w-4 h-4" />
+                    Chat on WhatsApp
+                  </a>
+                  <a 
+                    href="tel:+919787812345"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-[#2A0410] font-bold text-[0.85rem] transition-all hover:brightness-110 shadow-lg hover:shadow-[#D4AF37]/30 hover:-translate-y-0.5"
+                    style={{ background: 'linear-gradient(90deg, #D4AF37, #F3E5AB)' }}
+                  >
+                    <Phone size={15} fill="currentColor" strokeWidth={0} />
+                    Call Now
+                  </a>
+                </div>
+              </motion.div>
+
+              {/* Founder 2 */}
+              <motion.div 
+                variants={blurRevealVariants}
+                className="flex flex-col items-center text-center md:pl-10 group/founder pt-8 md:pt-0 border-t md:border-t-0 border-white/10"
+              >
+                <div className="w-[150px] h-[150px] rounded-full border border-[#D4AF37]/50 p-1 mb-5 transition-transform duration-500 group-hover/founder:scale-105 group-hover/founder:shadow-[0_0_20px_rgba(212,175,55,0.2)] group-hover/founder:border-[#D4AF37]">
+                  <div className="w-full h-full rounded-full bg-white/5 overflow-hidden relative">
+                    <img src="./video/contact2.jpeg" alt="Vignesh PK" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-80 group-hover/founder:opacity-100 transition-opacity duration-300" />
+                  </div>
+                </div>
+                <h4 className="text-[1.35rem] font-playfair font-bold text-white mb-1 group-hover/founder:text-[#D4AF37] transition-colors">Vignesh PK</h4>
+                <p className="text-[#D4AF37] font-medium text-[0.85rem] mb-1">Co-Founder</p>
+                <p className="text-gray-300 text-[0.85rem] mb-6">Catering & Client Relations</p>
+                
+                <div className="flex flex-col gap-3 mb-8 w-max mx-auto">
+                  <a href="tel:+918903093089" className="flex items-center gap-4 text-gray-300 hover:text-[#D4AF37] transition-colors">
+                    <Phone size={18} strokeWidth={1.5} className="opacity-80" />
+                    <span className="text-[0.95rem] tracking-wide">+91 89030 93089</span>
+                  </a>
+                  <a href="mailto:pkvignesh255@gmail.com" className="flex items-center gap-4 text-gray-300 hover:text-[#D4AF37] transition-colors">
+                    <Mail size={18} strokeWidth={1.5} className="opacity-80" />
+                    <span className="text-[0.95rem]">pkvignesh255@gmail.com</span>
+                  </a>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 w-full mt-auto justify-center">
+                  <a 
+                    href="https://wa.me/918903093089"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:border-[#25D366] hover:text-[#25D366] hover:bg-[#25D366]/5 transition-all font-medium text-[0.85rem]"
+                  >
+                    <WhatsAppIcon className="w-4 h-4" />
+                    Chat on WhatsApp
+                  </a>
+                  <a 
+                    href="tel:+918903093089"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-[#2A0410] font-bold text-[0.85rem] transition-all hover:brightness-110 shadow-lg hover:shadow-[#D4AF37]/30 hover:-translate-y-0.5"
+                    style={{ background: 'linear-gradient(90deg, #D4AF37, #F3E5AB)' }}
+                  >
+                    <Phone size={15} fill="currentColor" strokeWidth={0} />
+                    Call Now
+                  </a>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
+
         <div className="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
           
-          {/* Contact Information Cards */}
           <motion.div
             initial="hidden"
             whileInView="show"
@@ -144,7 +405,7 @@ export default function Contact() {
             {/* Email Card */}
             <motion.a 
               variants={blurRevealVariants}
-              href="mailto:iduraish@gmail.com" 
+              href="mailto:pandiyan.durai@gmail.com" 
               className="group glass-card p-6 rounded-2xl border border-white/5 hover:border-[#D4AF37]/50 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(212,175,55,0.2)] block relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-[40px] group-hover:bg-[#D4AF37]/20 transition-colors pointer-events-none" />
@@ -152,7 +413,7 @@ export default function Contact() {
                 <Mail size={24} />
               </div>
               <h4 className="font-playfair font-bold text-xl mb-2 text-white relative z-10">Email</h4>
-              <p className="text-gray-300 group-hover:text-white transition-colors relative z-10 truncate">iduraish@gmail.com</p>
+              <p className="text-gray-300 group-hover:text-white transition-colors relative z-10 truncate">pandiyan.durai@gmail.com</p>
             </motion.a>
 
             {/* Location Card */}
@@ -212,7 +473,6 @@ export default function Contact() {
               variants={blurRevealVariants}
               className="sm:col-span-2 lg:col-span-3 flex flex-col items-center justify-center pt-10 pb-4 select-none"
             >
-              {/* Opening decorative quote mark */}
               <span
                 aria-hidden="true"
                 className="block text-[#D4AF37] opacity-30 font-serif leading-none mb-4"
@@ -222,7 +482,6 @@ export default function Contact() {
               </span>
 
               <div className="text-center max-w-md mx-auto">
-                {/* Line 1 */}
                 <p
                   className="leading-snug mb-2"
                   style={{
@@ -246,7 +505,6 @@ export default function Contact() {
                   <span className="text-white"> ...</span>
                 </p>
 
-                {/* Line 2 */}
                 <p
                   className="leading-snug"
                   style={{
@@ -270,7 +528,6 @@ export default function Contact() {
                   <span className="text-white">-யா ??</span>
                 </p>
 
-                {/* Signature */}
                 <p
                   className="mt-8 text-right"
                   style={{
@@ -287,7 +544,6 @@ export default function Contact() {
                 </p>
               </div>
 
-              {/* Closing decorative quote mark */}
               <span
                 aria-hidden="true"
                 className="block text-[#D4AF37] opacity-30 font-serif leading-none mt-4"
@@ -301,101 +557,156 @@ export default function Contact() {
 
           {/* Booking Form */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-            whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
             className="glass-card p-8 rounded-3xl border border-[#D4AF37]/20 shadow-[0_0_30px_rgba(212,175,55,0.05)] relative overflow-hidden group"
           >
-            {/* Glow effect */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-[80px] pointer-events-none group-hover:bg-[#D4AF37]/15 transition-colors duration-700" />
 
             <h3 className="text-3xl font-playfair font-bold text-white mb-2 relative z-10">Book Your Event</h3>
             <p className="text-gray-400 mb-8 relative z-10">Fill the details below to receive a quick quote via WhatsApp.</p>
 
-            <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+            <form onSubmit={handleSubmit} className="space-y-6 relative z-10" noValidate>
               <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-300 font-medium">Full Name</label>
+                  <label htmlFor="name" className="text-sm text-gray-300 font-medium">Full Name <span className="text-red-500">*</span></label>
                   <input 
+                    id="name"
                     type="text" 
                     name="name" 
                     required 
                     value={formData.name} 
                     onChange={handleChange}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all hover:border-white/20"
+                    onBlur={handleBlur}
+                    className={getInputClass('name')}
                     placeholder="Enter your name"
+                    aria-invalid={touched.name && !!errors.name}
+                    aria-describedby={touched.name && errors.name ? "name-error" : undefined}
                   />
+                  {touched.name && errors.name && (
+                    <p className="text-red-400 text-xs mt-1" id="name-error">{errors.name}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-300 font-medium">Phone Number</label>
+                  <label htmlFor="phone" className="text-sm text-gray-300 font-medium">Phone Number <span className="text-red-500">*</span></label>
                   <input 
+                    id="phone"
                     type="tel" 
                     name="phone" 
                     required 
                     value={formData.phone} 
                     onChange={handleChange}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all hover:border-white/20"
+                    onBlur={handleBlur}
+                    className={getInputClass('phone')}
                     placeholder="Enter phone number"
+                    aria-invalid={touched.phone && !!errors.phone}
+                    aria-describedby={touched.phone && errors.phone ? "phone-error" : undefined}
                   />
+                  {touched.phone && errors.phone && (
+                    <p className="text-red-400 text-xs mt-1" id="phone-error">{errors.phone}</p>
+                  )}
                 </div>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-300 font-medium">Event Date</label>
+                  <label htmlFor="date" className="text-sm text-gray-300 font-medium">Event Date <span className="text-red-500">*</span></label>
                   <input 
+                    id="date"
                     type="date" 
                     name="date" 
                     required 
+                    min={getTodayDate()}
                     value={formData.date} 
                     onChange={handleChange}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all hover:border-white/20 [color-scheme:dark]"
+                    onBlur={handleBlur}
+                    className={`${getInputClass('date')} [color-scheme:dark]`}
+                    aria-invalid={touched.date && !!errors.date}
+                    aria-describedby={touched.date && errors.date ? "date-error" : undefined}
                   />
+                  {touched.date && errors.date && (
+                    <p className="text-red-400 text-xs mt-1" id="date-error">{errors.date}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-300 font-medium">Number of People</label>
+                  <label htmlFor="people" className="text-sm text-gray-300 font-medium">Number of People <span className="text-red-500">*</span></label>
                   <input 
+                    id="people"
                     type="number" 
                     name="people" 
                     required 
+                    min="10"
+                    max="5000"
+                    step="1"
                     value={formData.people} 
                     onChange={handleChange}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all hover:border-white/20"
-                    placeholder="Estimated count"
+                    onBlur={handleBlur}
+                    className={getInputClass('people')}
+                    placeholder="Estimated count (10-5000)"
+                    aria-invalid={touched.people && !!errors.people}
+                    aria-describedby={touched.people && errors.people ? "people-error" : undefined}
                   />
+                  {touched.people && errors.people && (
+                    <p className="text-red-400 text-xs mt-1" id="people-error">{errors.people}</p>
+                  )}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-gray-300 font-medium">Event Type</label>
+                <label htmlFor="eventType" className="text-sm text-gray-300 font-medium">Event Type <span className="text-red-500">*</span></label>
                 <select 
+                  id="eventType"
                   name="eventType" 
                   required 
                   value={formData.eventType} 
                   onChange={handleChange}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all hover:border-white/20 [&>option]:bg-[#2A0410]"
+                  onBlur={handleBlur}
+                  className={`${getInputClass('eventType')} [&>option]:bg-[#2A0410]`}
+                  aria-invalid={touched.eventType && !!errors.eventType}
+                  aria-describedby={touched.eventType && errors.eventType ? "eventType-error" : undefined}
                 >
                   <option value="" disabled>Select Event Type</option>
                   <option value="Wedding">Wedding</option>
+                  <option value="Birthday Party">Birthday Party</option>
                   <option value="Reception">Reception</option>
-                  <option value="Birthday">Birthday</option>
-                  <option value="Corporate">Corporate</option>
-                  <option value="Outdoor Party">Outdoor Party</option>
+                  <option value="Corporate Event">Corporate Event</option>
+                  <option value="Engagement">Engagement</option>
+                  <option value="Baby Shower">Baby Shower</option>
+                  <option value="House Warming">House Warming</option>
+                  <option value="College Event">College Event</option>
+                  <option value="Temple Function">Temple Function</option>
                   <option value="Other">Other</option>
                 </select>
+                {touched.eventType && errors.eventType && (
+                  <p className="text-red-400 text-xs mt-1" id="eventType-error">{errors.eventType}</p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-gray-300 font-medium">Message / Requirements</label>
+                <div className="flex justify-between items-center">
+                  <label htmlFor="message" className="text-sm text-gray-300 font-medium">Message / Requirements</label>
+                  <span className={`text-xs ${formData.message.length >= 500 ? 'text-red-400' : 'text-gray-400'}`}>
+                    {500 - formData.message.length} characters remaining
+                  </span>
+                </div>
                 <textarea 
+                  id="message"
                   name="message" 
                   rows="3" 
+                  maxLength="500"
                   value={formData.message} 
                   onChange={handleChange}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all hover:border-white/20 resize-none"
+                  onBlur={handleBlur}
+                  className={`${getInputClass('message')} resize-none`}
                   placeholder="Any specific requests?"
+                  aria-invalid={touched.message && !!errors.message}
+                  aria-describedby={touched.message && errors.message ? "message-error" : undefined}
                 ></textarea>
+                {touched.message && errors.message && (
+                  <p className="text-red-400 text-xs mt-1" id="message-error">{errors.message}</p>
+                )}
               </div>
 
               <AnimatePresence>
@@ -416,24 +727,36 @@ export default function Contact() {
               </AnimatePresence>
 
               <motion.button
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: isFormValid() && !isSubmitting ? 0.97 : 1 }}
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full font-bold text-lg py-4 rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_40px_rgba(37,211,102,0.6)] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 btn-ripple touch-target"
+                disabled={!isFormValid() || isSubmitting}
+                className={`w-full font-bold text-lg py-4 rounded-full transition-all duration-300 flex items-center justify-center gap-3 ${
+                  isFormValid() 
+                    ? 'shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_40px_rgba(37,211,102,0.6)] cursor-pointer btn-ripple touch-target' 
+                    : 'opacity-50 cursor-not-allowed grayscale-[0.5]'
+                }`}
                 style={{ 
                   background: 'linear-gradient(90deg, #D4AF37, #F3E5AB)', 
                   color: '#2A0410' 
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#25D366';
-                  e.currentTarget.style.color = 'white';
+                  if (isFormValid()) {
+                    e.currentTarget.style.background = '#25D366';
+                    e.currentTarget.style.color = 'white';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(90deg, #D4AF37, #F3E5AB)';
-                  e.currentTarget.style.color = '#2A0410';
+                  if (isFormValid()) {
+                    e.currentTarget.style.background = 'linear-gradient(90deg, #D4AF37, #F3E5AB)';
+                    e.currentTarget.style.color = '#2A0410';
+                  }
                 }}
               >
-                <WhatsAppIcon className="w-6 h-6" />
+                {isSubmitting ? (
+                  <div className="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <WhatsAppIcon className="w-6 h-6" />
+                )}
                 {isSubmitting ? 'Opening WhatsApp...' : 'WhatsApp Booking'}
               </motion.button>
             </form>
@@ -443,4 +766,6 @@ export default function Contact() {
       </div>
     </section>
   );
-}
+});
+
+export default Contact;

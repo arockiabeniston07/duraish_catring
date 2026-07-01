@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 // Stable particle data using golden-angle distribution
@@ -22,7 +22,7 @@ const FloatingIcon = ({ emoji, style }) => (
   </div>
 );
 
-export default function Hero() {
+const Hero = React.memo(() => {
   const particles = useMemo(() => generateParticles(25), []);
   
   // Scroll container for framer motion parallax
@@ -85,7 +85,7 @@ export default function Hero() {
       {/* Gold rising particles */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         {particles.map((p) => (
-          <motion.div
+          <div
             key={`hero-particle-${p.id}`}
             className="absolute rounded-full"
             style={{
@@ -94,17 +94,8 @@ export default function Hero() {
               width: `${p.size}px`,
               height: `${p.size}px`,
               background: `radial-gradient(circle, #F3E5AB 0%, #D4AF37 60%, transparent 100%)`,
-            }}
-            animate={{
-              y: [0, -window.innerHeight * 1.2],
-              opacity: [0, 0.8, 0],
-              scale: [0.5, 1, 0.5],
-            }}
-            transition={{
-              duration: p.duration,
-              delay: p.delay,
-              repeat: Infinity,
-              ease: 'linear',
+              animation: `particle-rise ${p.duration}s linear infinite ${p.delay}s`,
+              willChange: 'transform, opacity'
             }}
           />
         ))}
@@ -171,4 +162,6 @@ export default function Hero() {
       </div>
     </section>
   );
-}
+});
+
+export default Hero;

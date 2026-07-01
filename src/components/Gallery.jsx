@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import ReelCarousel from './ReelCarousel';
 import { galleryVideos } from '../data/staticData';
 
-export default function Gallery() {
+const Gallery = React.memo(() => {
   const textRevealVariants = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } }
@@ -44,4 +44,6 @@ export default function Gallery() {
       </div>
     </section>
   );
-}
+});
+
+export default Gallery;

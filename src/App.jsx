@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import Lenis from 'lenis';
 
 // Components
@@ -15,51 +16,74 @@ import Footer from './components/Footer';
 import LoadingScreen from './components/LoadingScreen';
 
 // ---- Scroll Progress Bar ----
-function ScrollProgress() {
-  const [progress, setProgress] = useState(0);
-  useEffect(() => {
-    const update = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      setProgress(docHeight > 0 ? (scrollTop / docHeight) * 100 : 0);
-    };
-    window.addEventListener('scroll', update, { passive: true });
-    return () => window.removeEventListener('scroll', update);
-  }, []);
+const ScrollProgress = React.memo(() => {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+  
   return (
     <div className="fixed top-0 left-0 right-0 z-[200] h-[2px] bg-transparent pointer-events-none">
-      <div
-        className="h-full transition-all duration-75"
-        style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #D4AF37, #F3E5AB, #D4AF37)' }}
+      <motion.div
+        className="h-full origin-left"
+        style={{ scaleX, background: 'linear-gradient(90deg, #D4AF37, #F3E5AB, #D4AF37)', willChange: 'transform' }}
       />
     </div>
   );
-}
+});
 
 // ---- Mouse Glow Effect ----
-function MouseGlow() {
-  const [pos, setPos] = useState({ x: -300, y: -300 });
+const MouseGlow = React.memo(() => {
+  const glowRef = useRef(null);
+
   useEffect(() => {
-    const move = (e) => setPos({ x: e.clientX, y: e.clientY });
+    if (window.innerWidth < 1024) return;
+    
+    let currentX = -300;
+    let currentY = -300;
+    let targetX = -300;
+    let targetY = -300;
+    let rafId;
+
+    const move = (e) => {
+      targetX = e.clientX - 250;
+      targetY = e.clientY - 250;
+    };
+
+    const animate = () => {
+      currentX += (targetX - currentX) * 0.15;
+      currentY += (targetY - currentY) * 0.15;
+      if (glowRef.current) {
+        glowRef.current.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+      }
+      rafId = requestAnimationFrame(animate);
+    };
+
     window.addEventListener('mousemove', move, { passive: true });
-    return () => window.removeEventListener('mousemove', move);
+    rafId = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener('mousemove', move);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
+
   return (
     <div
-      className="fixed pointer-events-none z-[150] w-[500px] h-[500px] rounded-full opacity-[0.025] blur-[80px]"
+      ref={glowRef}
+      className="fixed top-0 left-0 pointer-events-none z-[150] w-[500px] h-[500px] rounded-full opacity-[0.025] blur-[80px] hidden lg:block"
       style={{
-        left: pos.x - 250,
-        top: pos.y - 250,
         background: 'radial-gradient(circle, #D4AF37 0%, transparent 70%)',
-        transform: 'translate3d(0,0,0)',
-        transition: 'left 0.15s ease-out, top 0.15s ease-out',
+        willChange: 'transform'
       }}
     />
   );
-}
+});
 
 // ---- Main Site ----
-function MainSite() {
+const MainSite = React.memo(() => {
   return (
     <div className="bg-transparent min-h-screen">
       <ScrollProgress />
@@ -77,7 +101,7 @@ function MainSite() {
       <Footer />
     </div>
   );
-}
+});
 
 // ---- App Root ----
 function App() {

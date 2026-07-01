@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin } from 'lucide-react';
 
@@ -24,7 +25,7 @@ const InstagramIcon = ({ size = 18 }) => (
   </svg>
 );
 
-export default function Footer() {
+const Footer = React.memo(() => {
   const quickLinks = [
     { name: 'Home', href: '#home' },
     { name: 'About', href: '#about' },
@@ -55,7 +56,7 @@ export default function Footer() {
     },
     {
       name: 'Email',
-      href: 'mailto:Pandiyandurai@gmail.com',
+      href: 'mailto:pandiyan.durai@gmail.com',
       icon: <Mail size={20} />,
       hoverColor: 'hover:text-[var(--secondary)] hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]',
     },
@@ -71,8 +72,8 @@ export default function Footer() {
       <div className="container mx-auto px-4 relative z-10">
         {/* Tamil Quote Banner */}
         <motion.div
-          initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.5 }}
           transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
           className="text-center mb-16 pb-16 border-b border-white/10"
@@ -145,12 +146,12 @@ export default function Footer() {
             <h4 className="font-playfair font-bold text-lg text-[var(--secondary)] mb-6 after:block after:w-10 after:h-0.5 after:bg-[var(--secondary)] after:mt-2">Contact Information</h4>
             <ul className="space-y-5">
               <li>
-                <a href="mailto:Pandiyandurai@gmail.com" className="flex items-start gap-3 group cursor-pointer hover:translate-x-1 transition-all duration-300 touch-target">
+                <a href="mailto:pandiyan.durai@gmail.com" className="flex items-start gap-3 group cursor-pointer hover:translate-x-1 transition-all duration-300 touch-target">
                   <Mail size={16} className="text-[var(--secondary)] shrink-0 mt-1 group-hover:scale-110 transition-transform duration-300 group-hover:-translate-y-1" />
                   <div>
                     <span className="text-gray-500 text-xs uppercase tracking-wider block mb-1">Email</span>
                     <span className="text-gray-300 group-hover:text-[var(--secondary)] transition-colors duration-300 text-sm">
-                      Pandiyandurai@gmail.com
+                      pandiyan.durai@gmail.com
                     </span>
                   </div>
                 </a>
@@ -256,4 +257,6 @@ export default function Footer() {
       </div>
     </footer>
   );
-}
+});
+
+export default Footer;
