@@ -80,8 +80,10 @@ const Contact = React.memo(() => {
           error = 'Please enter the number of people.';
         } else {
           const num = Number(value);
-          if (!Number.isInteger(num) || num < 10 || num > 5000) {
-            error = 'Number of people must be between 10 and 5000.';
+          if (!Number.isInteger(num) || num < 100 || num > 100000) {
+            error = 'Number of people must be between 100 and 100,000.';
+          } else if (num % 50 !== 0) {
+            error = 'Number must be a multiple of 50.';
           }
         }
         break;
@@ -132,6 +134,15 @@ const Contact = React.memo(() => {
     if (name === 'name') {
         newValue = value.trim();
         setFormData(prev => ({...prev, name: newValue}));
+    } else if (name === 'people' && value !== '') {
+        let num = Number(value);
+        if (!isNaN(num)) {
+            num = Math.round(num / 50) * 50;
+            if (num < 100) num = 100;
+            if (num > 100000) num = 100000;
+            newValue = num.toString();
+            setFormData(prev => ({...prev, people: newValue}));
+        }
     }
     setErrors((prev) => ({ ...prev, [name]: validateField(name, newValue) }));
   };
@@ -280,9 +291,9 @@ const Contact = React.memo(() => {
                 <p className="text-gray-300 text-[0.85rem] mb-6">Operations & Event Management</p>
                 
                 <div className="flex flex-col gap-3 mb-8 w-max mx-auto">
-                  <a href="tel:+919787812345" className="flex items-center gap-4 text-gray-300 hover:text-[#D4AF37] transition-colors">
+                  <a href="tel:+9188075 55905" className="flex items-center gap-4 text-gray-300 hover:text-[#D4AF37] transition-colors">
                     <Phone size={18} strokeWidth={1.5} className="opacity-80" />
-                    <span className="text-[0.95rem] tracking-wide">+91 97878 12345</span>
+                    <span className="text-[0.95rem] tracking-wide">+91 88075 55905</span>
                   </a>
                   <a href="mailto:pandiyan.durai@gmail.com" className="flex items-center gap-4 text-gray-300 hover:text-[#D4AF37] transition-colors">
                     <Mail size={18} strokeWidth={1.5} className="opacity-80" />
@@ -292,7 +303,7 @@ const Contact = React.memo(() => {
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full mt-auto justify-center">
                   <a 
-                    href="https://wa.me/919787812345"
+                    href="https://wa.me/9188075 55905"
                     target="_blank"
                     rel="noreferrer"
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:border-[#25D366] hover:text-[#25D366] hover:bg-[#25D366]/5 transition-all font-medium text-[0.85rem]"
@@ -301,7 +312,7 @@ const Contact = React.memo(() => {
                     Chat on WhatsApp
                   </a>
                   <a 
-                    href="tel:+919787812345"
+                    href="tel:+918807555905"
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-[#2A0410] font-bold text-[0.85rem] transition-all hover:brightness-110 shadow-lg hover:shadow-[#D4AF37]/30 hover:-translate-y-0.5"
                     style={{ background: 'linear-gradient(90deg, #D4AF37, #F3E5AB)' }}
                   >
@@ -637,14 +648,19 @@ const Contact = React.memo(() => {
                     type="number" 
                     name="people" 
                     required 
-                    min="10"
-                    max="5000"
-                    step="1"
+                    min="100"
+                    max="100000"
+                    step="50"
                     value={formData.people} 
                     onChange={handleChange}
                     onBlur={handleBlur}
+                    onKeyDown={(e) => {
+                      if (['e', 'E', '+', '-', '.'].includes(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
                     className={getInputClass('people')}
-                    placeholder="Estimated count (10-5000)"
+                    placeholder="100 - 100000 (Step: 50)"
                     aria-invalid={touched.people && !!errors.people}
                     aria-describedby={touched.people && errors.people ? "people-error" : undefined}
                   />
